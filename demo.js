@@ -7075,7 +7075,7 @@ html, body { margin: 0; min-height: 100vh; background: #09070d; }
     return native(url, options);
   };
   var edit = new URLSearchParams(location.search).has("edit") || location.pathname.includes("/admin");
-  var html3 = render3(edit);
+  var html3 = render3(edit).replaceAll('src="/assets/', 'src="assets/').replaceAll('href="/assets/', 'href="assets/');
   var parsed = new DOMParser().parseFromString(html3, "text/html");
   document.head.innerHTML = '<base href="/vd-showcase/">' + parsed.head.innerHTML.replaceAll('src="/assets/', 'src="assets/').replaceAll('href="/assets/', 'href="assets/');
   document.body.innerHTML = parsed.body.innerHTML;
