@@ -1,0 +1,19 @@
+(() => {
+  const content=document.getElementById('login-content'),error=document.getElementById('login-error');
+  let token=new URLSearchParams(location.hash.slice(1)).get('setup');
+  if(token)history.replaceState(null,'',location.pathname+location.search);
+  const go=()=>{const p=new URLSearchParams(location.search);location.replace(p.has('dashboard')||p.has('panel')?location.pathname+location.search:'/?edit=1');};
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  async function api(path,data){const r=await fetch('/api/'+path,{method:data?'POST':'GET',headers:data?{'Content-Type':'application/json'}:{},body:data?JSON.stringify(data):undefined});const v=await r.json();if(!r.ok)throw Error(v.error);return v;}
+  function form(setup){content.innerHTML='<div class="eyebrow">'+(setup?'Первый запуск':'Доступ владельца')+'</div><h1>'+(setup?'Создать аккаунт':'Войти в редактор')+'</h1><p class="muted">'+(setup?'Задайте пароль, затем подключите приложение-аутентификатор.':'После входа инструменты появятся прямо на сайте.')+'</p><form id="'+(setup?'setup-start':'login-form')+'"><label>Логин<input name="login" autocomplete="username" minlength="3" maxlength="80" required></label><label>Пароль<input name="password" type="password" autocomplete="'+(setup?'new-password':'current-password')+'" minlength="12" maxlength="128" required></label>'+(setup?'':'<label>Код приложения или резервный код<input name="code" autocomplete="one-time-code" required></label>')+'<button type="submit" class="primary">'+(setup?'Продолжить':'Войти')+'</button></form>';}
+  document.addEventListener('submit',async e=>{
+    e.preventDefault();const f=e.target,b=f.querySelector('button');b.disabled=true;error.textContent='';
+    try{
+      const data=Object.fromEntries(new FormData(f));
+      if(f.id==='login-form'){await api('login',data);go();}
+      if(f.id==='setup-start'){const r=await api('setup/start',{...data,token});content.innerHTML='<h1>Подключите защиту</h1><p>Отсканируйте QR-код в приложении-аутентификаторе.</p><img class="qr" src="'+esc(r.qr)+'" alt="QR-код"><details><summary>Ключ для ручного ввода</summary><p class="secret">'+esc(r.secret)+'</p></details><form id="setup-finish"><label>Код из приложения<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" required></label><button type="submit" class="primary">Подтвердить</button></form>';}
+      if(f.id==='setup-finish'){const r=await api('setup/finish',{...data,token});token=null;content.innerHTML='<h1>Сохраните резервные коды</h1><p>Они позволят войти, если телефон недоступен. Каждый код работает один раз.</p><div class="recovery">'+r.recovery.map(c=>'<code>'+esc(c)+'</code>').join('')+'</div><button class="primary" id="download-codes">Скачать коды</button><button class="primary" data-action="finish-setup">Коды сохранены · открыть сайт</button>';document.getElementById('download-codes').onclick=()=>{const u=URL.createObjectURL(new Blob([r.recovery.join('\n')],{type:'text/plain'})),a=document.createElement('a');a.href=u;a.download='VD-резервные-коды.txt';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);};content.querySelector('[data-action=finish-setup]').onclick=go;}
+    }catch(err){error.textContent=err.message;}finally{b.disabled=false;}
+  });
+  api('session').then(async s=>{if(s.authenticated&&!token)return go();if(s.needsSetup&&!token){content.innerHTML='<h1>Первый запуск</h1><p>Откройте ссылку настройки из окна «Запустить админку.cmd».</p>';return;}let info;if(token)info=await api('setup/info',{token});form(s.needsSetup||!!token);if(info?.login){const input=content.querySelector('[name=login]');input.value=info.login;input.readOnly=true;content.querySelector('h1').textContent=info.recovery?'Восстановить вход':'Настроить вход редактора';}}).catch(e=>error.textContent=e.message);
+})();

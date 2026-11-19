@@ -1,0 +1,17 @@
+<svg style="background:#21172c" class="v-floor-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 760" aria-hidden="true">
+
+
+
+
+
+<path class="wall" d="M50 90V190 M435 32V275 M540 32V275 M635 32V275 M645 290H870 M165 320V530 M165 610V722H25 M25 420H165 M25 560H165 M285 388V310H430V492H285 M450 510H865 M455 722H865 M430 310H865"></path>
+<path fill="none" stroke="#d9b6f3" stroke-width="2" d="M120 135h70m-12-10 12 10-12 10"></path>
+<circle cx="280" cy="128" r="12" fill="#c49ce0"></circle><path d="M258 159q22-25 44 0v10h-44z" fill="#c49ce0"></path>
+<text x="70" y="110">ВХОД</text><text x="280" y="207" text-anchor="middle">СТОЙКА</text><text x="280" y="230" text-anchor="middle">АДМИНИСТРАТОРА</text>
+
+
+
+
+
+<text class="service-name" x="866" y="307" text-anchor="end">Уборная 1</text><text class="service-name" x="864" y="701" text-anchor="end">Уборная 2</text>
+<style>.zone-fill{fill:#392347;stroke:#74528c;stroke-width:2}.wall{fill:none;stroke:#9d73b8;stroke-width:5}text{fill:#d1b8e3;font:16px Arial}.room-name{font-weight:bold}</style></svg>
